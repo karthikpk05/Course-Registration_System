@@ -1,4 +1,3 @@
-# Course-Registration_System
 # Course Registration System
 
 ## Description
