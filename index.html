@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Course Registration System</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    button { margin-right: 10px; padding: 10px 20px; }
+    .hidden { display: none; }
+    form { margin-top: 20px; max-width: 400px; }
+    label { display: block; margin: 10px 0 5px; }
+    input, select { width: 100%; padding: 8px; margin-bottom: 10px; }
+    table { margin-top: 20px; border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+  </style>
+</head>
+<body>
+  <h1>Course Registration System</h1>
+
+  <div>
+    <button id="registerBtn">Register a Course</button>
+    <button id="availableBtn">Available Courses</button>
+    <button id="enrolledBtn">View Enrolled Students</button>
+  </div>
+
+  <!-- Register Form -->
+  <div id="registerForm" class="hidden">
+    <h2>Register for a Course</h2>
+    <form id="courseForm">
+      <label for="name">Name:</label>
+      <input type="text" id="name" name="name" required>
+
+      <label for="email">Email:</label>
+      <input type="email" id="email" name="email" required>
+
+      <label for="course">Select Course:</label>
+      <select id="course" name="course" required></select>
+
+      <button type="submit">Register</button>
+    </form>
+  </div>
+
+  <!-- Available Courses -->
+  <div id="availableCourses" class="hidden">
+    <h2>Available Courses</h2>
+    <ul id="courseList"></ul>
+  </div>
+
+  <!-- Enrolled Students -->
+  <div id="enrolledStudents" class="hidden">
+    <h2>Enrolled Students</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Course</th>
+        </tr>
+      </thead>
+      <tbody id="studentList"></tbody>
+    </table>
+  </div>
+
+<script>
+const registerBtn = document.getElementById('registerBtn');
+const availableBtn = document.getElementById('availableBtn');
+const enrolledBtn = document.getElementById('enrolledBtn');
+
+const registerFormDiv = document.getElementById('registerForm');
+const availableCoursesDiv = document.getElementById('availableCourses');
+const enrolledStudentsDiv = document.getElementById('enrolledStudents');
+
+const courseSelect = document.getElementById('course');
+const courseList = document.getElementById('courseList');
+const studentList = document.getElementById('studentList');
+const courseForm = document.getElementById('courseForm');
+
+const showDiv = (div) => {
+  registerFormDiv.classList.add('hidden');
+  availableCoursesDiv.classList.add('hidden');
+  enrolledStudentsDiv.classList.add('hidden');
+  div.classList.remove('hidden');
+};
+
+// Button events
+registerBtn.addEventListener('click', async () => {
+  showDiv(registerFormDiv);
+  await fetchCourses();
+});
+
+availableBtn.addEventListener('click', async () => {
+  showDiv(availableCoursesDiv);
+  await fetchCoursesList();
+});
+
+enrolledBtn.addEventListener('click', async () => {
+  showDiv(enrolledStudentsDiv);
+  await fetchEnrolledStudents();
+});
+
+// Fetch courses
+async function fetchCourses() {
+  const res = await fetch('http://localhost:8080/api/courses');
+  const courses = await res.json();
+  courseSelect.innerHTML = '';
+  courses.forEach(course => {
+    const option = document.createElement('option');
+    option.value = course.id;
+    option.textContent = course.name;
+    courseSelect.appendChild(option);
+  });
+}
+
+// Fetch available courses list
+async function fetchCoursesList() {
+  const res = await fetch('http://localhost:8080/api/courses');
+  const courses = await res.json();  // Should return an array of courses
+  courseList.innerHTML = '';
+  courses.forEach(course => {
+    const li = document.createElement('li');
+    li.textContent = course.name;
+    courseList.appendChild(li);
+  });
+}
+
+
+// Fetch enrolled students
+async function fetchEnrolledStudents() {
+  const res = await fetch('http://localhost:8080/api/registrations');
+  const students = await res.json();
+  studentList.innerHTML = '';
+  students.forEach(s => {
+    const tr = document.createElement('tr');
+    const courseName = s.course?.name || 'Unknown';
+    tr.innerHTML = `<td>${s.name}</td><td>${s.email}</td><td>${courseName}</td>`;
+    studentList.appendChild(tr);
+  });
+}
+
+// Submit registration
+courseForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const data = {
+    name: courseForm.name.value,
+    email: courseForm.email.value,
+    courseId: parseInt(courseForm.course.value)
+  };
+  const res = await fetch('http://localhost:8080/api/registrations', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify(data)
+  });
+  if(res.ok){
+    alert('Registration successful!');
+    courseForm.reset();
+  } else {
+    const err = await res.text();
+    alert('Failed to register: ' + err);
+  }
+});
+</script>
+</body>
+</html>
