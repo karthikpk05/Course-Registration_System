@@ -38,14 +38,14 @@ This system stores all course and student registration data in a **MySQL databas
 ## Application Screenshots
 
 ### Available Courses
-![Available Courses]("screenshots/Screenshot (211).png")
+![Available Courses]("/screenshots/Screenshot (211).png")
 
 ### Registration Form
-![Registration Form]("screenshots/Screenshot (210).png")
+![Registration Form]("/screenshots/Screenshot (210).png")
 
 ### Enrolled Students
-![Enrolled Students]("screenshots/Screenshot (213).png")
+![Enrolled Students]("/screenshots/Screenshot (213).png")
 
 ### Database
 
-![Database]("screenshots/Screenshot (215).png")
+![Database]("/screenshots/Screenshot (215).png")
